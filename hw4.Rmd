@@ -1,0 +1,41 @@
+---
+title: "HW 4"
+author: "Jenny Balmagia"
+date: "May 29, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Load Packages and Read Data 
+
+library(tidyverse)
+
+mcca <- read_csv("HW4Data.csv")
+```
+
+Part 1. Functional Forms and Marginal Abatement Cost
+```{r}
+#Explore the data
+
+plota <- ggplot(mcca, aes(x = Abatement, y = MC_A ))+ #concave? log - asymptotic?
+  geom_point()
+plota
+
+plotb <- ggplot(mcca, aes(x = Abatement, y = MC_B ))+ #concave? log - asymptotic?
+  geom_point()
+plotb
+
+plotc <- ggplot(mcca, aes(x = Abatement, y = MC_C ))+ #exponential, convex, y = x^2
+  geom_point()
+plotc
+
+plotd <- ggplot(mcca, aes(x = Abatement, y = MC_D ))+ 
+  geom_point() #stepwise? looks like one slope from 0-100, then another from 100 - 150
+plotd
+
+```
+
