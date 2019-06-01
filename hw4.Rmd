@@ -1,41 +1,172 @@
 ---
-title: "HW 4"
-author: "Jenny Balmagia"
+title: "Technical Appendix"
+author: "Jenny Balmagia & Camila Bobroff"
 date: "May 29, 2019"
-output: html_document
+output:
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r}
+```{r, include=FALSE}
 #Load Packages and Read Data 
 
 library(tidyverse)
+library(janitor)
 
-mcca <- read_csv("HW4Data.csv")
+mcca <- read_csv("HW4Data.csv") %>% 
+  clean_names()
 ```
 
-Part 1. Functional Forms and Marginal Abatement Cost
-```{r}
+### Part 1. Functional forms for the marginal cost of abatement by sector
+Write down a plausible functional form for the marginal cost of abatement for sector A. Use regression analysis to estimate the parameters of that function. Repeating this for sectors B, C, and D will give you a model of the marginal cost of abatement function for each sector. How well do your models fit the data for each sector? You may need to experiment with different functional forms. Produce a plot of the estimated marginal abatement cost functions in all four sectors (this plot should go in your memo).
+
+#### Sector A
+```{r, echo=FALSE}
 #Explore the data
-
-plota <- ggplot(mcca, aes(x = Abatement, y = MC_A ))+ #concave? log - asymptotic?
+plota <- ggplot(mcca, aes(x = abatement, y = mc_a ))+
   geom_point()
-plota
 
-plotb <- ggplot(mcca, aes(x = Abatement, y = MC_B ))+ #concave? log - asymptotic?
-  geom_point()
-plotb
+# The plot looks linear (tip from Sam), use linear regression to find equation
+a_lm <- lm(mc_a ~ abatement, data = mcca)
 
-plotc <- ggplot(mcca, aes(x = Abatement, y = MC_C ))+ #exponential, convex, y = x^2
-  geom_point()
-plotc
+# Plot the linear model to check the fit (looks good)
+a_lm_plot <- ggplot(mcca, aes(x=abatement, y=mc_a)) +
+  geom_point() + 
+  geom_smooth(method = "lm", formula = y~x)
+a_lm_plot
 
-plotd <- ggplot(mcca, aes(x = Abatement, y = MC_D ))+ 
-  geom_point() #stepwise? looks like one slope from 0-100, then another from 100 - 150
-plotd
+# Save the regression coefficients
+a_intercept <- a_lm$coefficients[1]
+a_slope <- a_lm$coefficients[2]
+
+# Write function
+a_curve <- function(x){a_intercept + a_slope*x}
 
 ```
+
+$Sector~A~Marinal~Cost~of~Abatement = `r a_intercept`+`r a_slope`*q$ 
+
+#### Sector B
+```{r, echo=FALSE}
+# Explore the data
+plotb <- ggplot(mcca, aes(x = abatement, y = mc_b))+ 
+  geom_point()
+
+# The plot looks linear (tip from Sam), use linear regression to find equation
+b_lm <- lm(mc_b ~ abatement, data = mcca)
+
+# Graph the linear model to check the fit (not great)
+b_lm_plot <- ggplot(mcca, aes(x=abatement, y=mc_b)) +
+  geom_point() + 
+  geom_smooth(method = "lm", formula = y~x)
+b_lm_plot
+
+# Save the regression coefficients
+b_intercept <- b_lm$coefficients[1]
+b_slope <- b_lm$coefficients[2]
+
+# Write function
+b_curve <- function(x){b_intercept + b_slope*x}
+
+```
+$Sector~B~Marinal~Cost~of~Abatement = `r b_intercept`+`r b_slope`*q$ 
+
+#### Sector C
+```{r, echo=FALSE}
+# Explore the data
+plotc <- ggplot(mcca, aes(x = abatement, y = mc_c ))+ #exponential, convex, y = x^2
+  geom_point()
+
+# The plot looks exponential (though Sam said he was doing linear for all sectors...), use exponential model to find equation
+
+c_exp <- lm(log(mc_c) ~ abatement, data = mcca)
+
+# Graph the exponential model to check the fit (looks pretty good)
+c_exp_plot <- ggplot(mcca, aes(x=abatement, y=mc_c)) +
+  geom_point() + 
+  stat_smooth(method="lm", formula= y ~ x + I(x^2), linetype = 1)
+c_exp_plot
+
+# Save the regression coefficients
+c_intercept <- c_exp$coefficients[1]
+c_slope <- c_exp$coefficients[2]
+
+# QUESTION: Does the equation below look correct?
+
+# Write function
+c_curve <- function(x){c_intercept + c_slope*x^2}
+```
+$Sector~C~Marinal~Cost~of~Abatement =`r c_intercept`+`r c_slope`*q^{2}$ 
+
+
+#### Sector D
+```{r, echo=FALSE}
+# Explore the data
+plotd <- ggplot(mcca, aes(x = abatement, y = mc_d ))+ 
+  geom_point() #stepwise? looks like one slope from 0-100, then another from 100 - 150
+
+# The plot looks somewhat linear (Sam said he was doing linear for all sectors...), use linear regression to find equation
+
+d_lm <- lm(mc_d ~ abatement, data = mcca)
+
+# Graph the exponential model to check the fit (not great)
+d_lm_plot <- ggplot(mcca, aes(x=abatement, y=mc_d)) +
+  geom_point() + 
+  stat_smooth(method="lm", formula = y~x)
+d_lm_plot
+
+# Save the regression coefficients
+d_intercept <- d_lm$coefficients[1]
+d_slope <- d_lm$coefficients[2]
+
+# Write function
+d_curve <- function(x){d_intercept + d_slope*x}
+
+```
+
+Add a table to answer: How well do your models fit the data for each sector?
+
+```{r, echo=FALSE}
+# Plot all curves on one graph (to be included in the memo)
+
+all_plot <- ggplot(data.frame(x = c(0, 200))) +
+  stat_function(fun = a_curve, aes(color = "A")) +
+  stat_function(fun = b_curve, aes(color = "B")) +
+  stat_function(fun = c_curve, aes(color = "C")) +
+  stat_function(fun = d_curve, aes(color = "D")) +
+  scale_y_continuous(limits= c(-10,100), expand = c(0,0)) +
+  scale_x_continuous(limits= c(0, 200), expand = c(0,0)) + 
+  labs(fill = "", color = "Sector") +
+  xlab("\n Carbon Abatement (ton)") + 
+  ylab("Price \n($/ton) \n") + 
+  ggtitle("Marginal Cost of Carbon Abatement by Sector\n") + 
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(angle=0, hjust = 0.5, vjust = 0.5)) 
+
+all_plot
+```
+
+### Part 2. Derive each sector's demand curve
+Using these models and the current level of carbon emissions, derive each sector’s demand curve for carbon emissions. In other words, how much would each sector be willing to pay for the right to pollute the first unit, second unit, etc? Draw these demand curves on a graph. Which sector is willing to pay the most for the first unit of carbon emissions?
+
+
+### Part 3. Country X 
+Now focus on country X (which contains sectors A, B, and C). Assume there are no “co-benefits” from carbon abatement (i.e. that there are no local pollutants that are affected by carbon abatement). Suppose to meet the Paris Accord commitments, country X needs to cut all carbon emissions in half. For each of the policy options listed below, derive: (1) the total cost of meeting the target in country X, (2) the cost (or benefit) to each sector, and (3) the tax revenue generated.
+a. Cap on carbon. Each sector (A, B, and C) must cut its carbon emissions by 100 tons (thus reducing total emissions from 600 down to 300).
+b. Tax on carbon. To emit a ton of carbon in country X, you must pay a tax of $t. You will need to find the tax that accomplishes the desired reduction.
+c. Cap and trade. Each sector (A, B, C) is allocated carbon permits equal to their current emissions minus 100 (same as in (a) above), thus achieving the total reduction of 300. Then, these three sectors are allowed to trade with each other. You will need to derive the outcome of that trading.
+
+
+### Part 4. Country Y
+Again, without any co-benefits, suppose that country Y (which only has one carbon-emitting sector, D) has no obligation to reduce its emissions. Country X asks country Y to enter the country X carbon market. Doing so would require country Y to put a cap on carbon emissions at its current level of emissions (300 tons), but would then allow country Y to sell carbon offsets to sectors A, B, or C. Are there any incentives for country Y to enter country X’s carbon market and to thus place a voluntary cap on its emissions? Are there any incentives for country X to try to attract country Y into its market?
+
+
+### Part 5. Air pollution externality
+Now assume that every ton of carbon emissions creates 1 ton of local air pollution. Local air pollution causes economic damages (health, environmental, etc.), but only in the country in which it is emitted. Assume there are no local air pollution regulations in either country X or country Y.
+a. In a carbon cap and trade market that only covers sectors in country X, how much local air pollution would you expect in country X? In country Y?
+b. If country Y enters the carbon market for country X (as in question 4 above), how much local pollution will there be in country X and country Y?
+c. What advice can you give country X and country Y about the desirability of allowing international trade of carbon emissions credits?
 
