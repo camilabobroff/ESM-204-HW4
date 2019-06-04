@@ -47,7 +47,7 @@ a_curve <- function(x){a_intercept + a_slope*x}
 
 ```
 
-$Sector~A~Marinal~Cost~of~Abatement = `r a_intercept`+`r a_slope`*q$ 
+$Sector~A~Marinal~Cost~of~Abatement = `r a_intercept`+`r a_slope`*x$ 
 
 #### Sector B
 ```{r, echo=FALSE}
@@ -72,7 +72,7 @@ b_slope <- b_lm$coefficients[2]
 b_curve <- function(x){b_intercept + b_slope*x}
 
 ```
-$Sector~B~Marinal~Cost~of~Abatement = `r b_intercept`+`r b_slope`*q$ 
+$Sector~B~Marinal~Cost~of~Abatement = `r b_intercept`+`r b_slope`*x$ 
 
 #### Sector C
 ```{r, echo=FALSE}
@@ -80,26 +80,43 @@ $Sector~B~Marinal~Cost~of~Abatement = `r b_intercept`+`r b_slope`*q$
 plotc <- ggplot(mcca, aes(x = abatement, y = mc_c ))+ #exponential, convex, y = x^2
   geom_point()
 
-# The plot looks exponential (though Sam said he was doing linear for all sectors...), use exponential model to find equation
+c_lm <- lm(mc_c ~ abatement, data = mcca)
 
-c_exp <- lm(log(mc_c) ~ abatement, data = mcca)
-
-# Graph the exponential model to check the fit (looks pretty good)
-c_exp_plot <- ggplot(mcca, aes(x=abatement, y=mc_c)) +
+# Graph the linear model to check the fit (not great)
+c_lm_plot <- ggplot(mcca, aes(x=abatement, y=mc_c)) +
   geom_point() + 
-  stat_smooth(method="lm", formula= y ~ x + I(x^2), linetype = 1)
-c_exp_plot
+  geom_smooth(method = "lm", formula = y~x)
+c_lm_plot
 
 # Save the regression coefficients
-c_intercept <- c_exp$coefficients[1]
-c_slope <- c_exp$coefficients[2]
-
-# QUESTION: Does the equation below look correct?
+c_intercept <- c_lm$coefficients[1]
+c_slope <- c_lm$coefficients[2]
 
 # Write function
-c_curve <- function(x){c_intercept + c_slope*x^2}
+c_curve <- function(x){c_intercept + c_slope*x}
+
+
+################# Commenting out the exponential work below... messed with number 2
+# # The plot looks exponential (though Sam said he was doing linear for all sectors...), use exponential model to find equation
+# 
+# c_exp <- lm(log(mc_c) ~ abatement, data = mcca)
+# 
+# # Graph the exponential model to check the fit (looks pretty good)
+# c_exp_plot <- ggplot(mcca, aes(x=abatement, y=mc_c)) +
+#   geom_point() + 
+#   stat_smooth(method="lm", formula= y ~ x + I(x^2), linetype = 1)
+# c_exp_plot
+# 
+# # Save the regression coefficients
+# c_intercept <- c_exp$coefficients[1]
+# c_slope <- c_exp$coefficients[2]
+# 
+# # QUESTION: Does the equation below look correct?
+# 
+# # Write function
+# c_curve <- function(x){c_intercept + c_slope*x^2}
 ```
-$Sector~C~Marinal~Cost~of~Abatement =`r c_intercept`+`r c_slope`*q^{2}$ 
+$Sector~C~Marinal~Cost~of~Abatement =`r c_intercept`+`r c_slope`*x^{2}$ 
 
 
 #### Sector D
@@ -112,7 +129,7 @@ plotd <- ggplot(mcca, aes(x = abatement, y = mc_d ))+
 
 d_lm <- lm(mc_d ~ abatement, data = mcca)
 
-# Graph the exponential model to check the fit (not great)
+# Graph the linear model to check the fit (not great)
 d_lm_plot <- ggplot(mcca, aes(x=abatement, y=mc_d)) +
   geom_point() + 
   stat_smooth(method="lm", formula = y~x)
@@ -152,6 +169,75 @@ all_plot
 ### Part 2. Derive each sector's demand curve
 Using these models and the current level of carbon emissions, derive each sector’s demand curve for carbon emissions. In other words, how much would each sector be willing to pay for the right to pollute the first unit, second unit, etc? Draw these demand curves on a graph. Which sector is willing to pay the most for the first unit of carbon emissions?
 
+```{r}
+
+# Demand curve for Sector A
+
+a_demand_int <- a_curve(180)
+a_demand_slope <- (0-a_demand_int)/(180-0)
+
+#demand curve as a function 
+a_demand_curve <- function(x){
+  a_demand_int + a_demand_slope*x
+}
+
+# Demand curve for Sector B
+
+b_demand_int <- b_curve(180)
+b_demand_slope <- (0-b_demand_int)/(180-0)
+
+#demand curve as a function 
+b_demand_curve <- function(x){
+  b_demand_int + b_demand_slope*x
+}
+
+# Demand curve for Sector C
+
+c_demand_int <- c_curve(180)
+c_demand_slope <- (0-c_demand_int)/(180-0)
+
+#demand curve as a function 
+c_demand_curve <- function(x){
+  c_demand_int + c_demand_slope*x
+}
+
+# Demand curve for Sector D
+
+d_demand_int <- d_curve(180)
+d_demand_slope <- (0-d_demand_int)/(180-0)
+
+#demand curve as a function 
+d_demand_curve <- function(x){
+  d_demand_int + d_demand_slope*x
+}
+
+# Plot demand curves for each sector
+
+ggplot(data.frame(x=c(0,200))) + 
+  stat_function(fun=a_demand_curve, geom ="line", aes(color = "A")) + 
+  stat_function(fun=b_demand_curve, geom ="line", aes(color = "B")) +
+  stat_function(fun=c_demand_curve, geom ="line", aes(color = "C")) +
+  stat_function(fun=d_demand_curve, geom ="line", aes(color = "D")) +
+  labs(x = "Abatement", y = "Price")+
+  scale_x_continuous(limits =c(0,200), expand = c(0,0))+
+  scale_y_continuous(limits=c(0,150), expand=c(0,0))+
+  theme_bw() +
+  labs(fill = "", color = "Sector") +
+  xlab("\n Carbon Emissions (ton)") + 
+  ylab("Price \n($/ton) \n") + 
+  ggtitle("Marginal Willingness to Pay for Carbon Emissions by Sector\n") + 
+  theme(plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(angle=0, hjust = 0.5, vjust = 0.5)) 
+
+
+```
+
+$Sector~A~Marinal~Willingness~to~Pay =`r a_demand_int`+`r a_demand_slope`*x$   
+$Sector~B~Marinal~Willingness~to~Pay =`r b_demand_int`+`r b_demand_slope`*x$  
+$Sector~C~Marinal~Willingness~to~Pay =`r c_demand_int`+`r c_demand_slope`*x$  
+$Sector~D~Marinal~Willingness~to~Pay =`r d_demand_int`+`r d_demand_slope`*x$  
+
+Sector C is willing to pay the most for the first unit of carbon emissions.
 
 ### Part 3. Country X 
 Now focus on country X (which contains sectors A, B, and C). Assume there are no “co-benefits” from carbon abatement (i.e. that there are no local pollutants that are affected by carbon abatement). Suppose to meet the Paris Accord commitments, country X needs to cut all carbon emissions in half. For each of the policy options listed below, derive: (1) the total cost of meeting the target in country X, (2) the cost (or benefit) to each sector, and (3) the tax revenue generated.
