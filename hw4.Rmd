@@ -371,6 +371,9 @@ total_cost_tax <- a_cost_tax + b_cost_tax + c_cost_tax
 #3. Total tax revenue
 total_tax_revenue <- ((180-a_tax_units)*tax) + ((200-b_tax_units)*tax) + ((220-c_tax_units)*tax)
 
+#Net Social Benefit under Tax option
+nsb_tax <- total_cost_tax - total_tax_revenue
+
 ```
 
 
@@ -406,9 +409,22 @@ c_credit_benefit <- c_market_tons * tax
 ###Total Costs###
 
 #Sector A 
+a_ct_cost <- (a_100*(100-a_0abate)*1/2) + (a_0abate*a_intercept*1/2) - a_credit_benefit
+#$1360
 
-a_ct_cost <- 
+#Sector B
+b_ct_cost <- ((b_intercept + b_100)/2)*100 - b_credit_cost 
+#$3950
 
+#Sector C 
+c_ct_cost <- (c_100*(100-c_0abate)*1/2) + (c_0abate*a_intercept*1/2) - c_credit_benefit
+#$1401
+
+#Total for country X
+total_ct_cost <- a_ct_cost + b_ct_cost + c_ct_cost 
+
+total_ct_cost
+#$6712
 
 ```
 
