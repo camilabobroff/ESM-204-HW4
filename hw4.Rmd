@@ -274,6 +274,7 @@ c_abate <- function(x){(x - c_intercept)/c_slope}
 b_abate <- function(x){(x - b_intercept)/b_slope}
 
 a_0abate <- a_abate(0) #15 units
+b_0abate <- b_abate(0) #-46.9 units
 c_0abate <- c_abate(0) #14.9 units
 
 
@@ -369,6 +370,7 @@ total_cost_tax <- a_cost_tax + b_cost_tax + c_cost_tax
 
 #3. Total tax revenue
 total_tax_revenue <- ((180-a_tax_units)*tax) + ((200-b_tax_units)*tax) + ((220-c_tax_units)*tax)
+
 ```
 
 
@@ -413,6 +415,18 @@ a_ct_cost <-
 ### Part 4. Country Y
 Again, without any co-benefits, suppose that country Y (which only has one carbon-emitting sector, D) has no obligation to reduce its emissions. Country X asks country Y to enter the country X carbon market. Doing so would require country Y to put a cap on carbon emissions at its current level of emissions (300 tons), but would then allow country Y to sell carbon offsets to sectors A, B, or C. Are there any incentives for country Y to enter country X’s carbon market and to thus place a voluntary cap on its emissions? Are there any incentives for country X to try to attract country Y into its market?
 
+```{r}
+
+#For sector D - how much does it cost to abate 300th unit? 
+d_abate <- d_curve(300)
+# 87.7
+
+```
+
+Country Y (which only has one carbon-emitting sector, D) has a marginal abatement cost of $87.7, which is less than country X (17,712 dollars). Until both Country X and Country Y both have the same marginal cost of abatement, both countries are better off being in the carbon market.
+
+Incentives for Country Y to enter the the Country X carbon market: Benefit of selling carbon offsets to sectors A, B, and C of in Country X.
+Incentives for Country X to attract Country Y to the carbon market: Allowing sectors in Country X to emit more carbon by buying carbon offsets from Country Y and avoiding the increased costs of abatement.
 
 ### Part 5. Air pollution externality
 Now assume that every ton of carbon emissions creates 1 ton of local air pollution. Local air pollution causes economic damages (health, environmental, etc.), but only in the country in which it is emitted. Assume there are no local air pollution regulations in either country X or country Y.
