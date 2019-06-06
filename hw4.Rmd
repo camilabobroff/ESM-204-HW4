@@ -430,7 +430,23 @@ Incentives for Country X to attract Country Y to the carbon market: Allowing sec
 
 ### Part 5. Air pollution externality
 Now assume that every ton of carbon emissions creates 1 ton of local air pollution. Local air pollution causes economic damages (health, environmental, etc.), but only in the country in which it is emitted. Assume there are no local air pollution regulations in either country X or country Y.
+
 a. In a carbon cap and trade market that only covers sectors in country X, how much local air pollution would you expect in country X? In country Y?
+
+
+
 b. If country Y enters the carbon market for country X (as in question 4 above), how much local pollution will there be in country X and country Y?
+
+```{r}
+
+
+
+```
+
 c. What advice can you give country X and country Y about the desirability of allowing international trade of carbon emissions credits?
+
+```{r}
+
+
+```
 
