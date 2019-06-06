@@ -183,8 +183,8 @@ a_demand_curve <- function(x){
 
 # Demand curve for Sector B
 
-b_demand_int <- b_curve(180)
-b_demand_slope <- (0-b_demand_int)/(180-0)
+b_demand_int <- b_curve(200)
+b_demand_slope <- (0-b_demand_int)/(200-0)
 
 #demand curve as a function 
 b_demand_curve <- function(x){
@@ -193,8 +193,8 @@ b_demand_curve <- function(x){
 
 # Demand curve for Sector C
 
-c_demand_int <- c_curve(180)
-c_demand_slope <- (0-c_demand_int)/(180-0)
+c_demand_int <- c_curve(220)
+c_demand_slope <- (0-c_demand_int)/(220-0)
 
 #demand curve as a function 
 c_demand_curve <- function(x){
@@ -203,8 +203,8 @@ c_demand_curve <- function(x){
 
 # Demand curve for Sector D
 
-d_demand_int <- d_curve(180)
-d_demand_slope <- (0-d_demand_int)/(180-0)
+d_demand_int <- d_curve(300)
+d_demand_slope <- (0-d_demand_int)/(300-0)
 
 #demand curve as a function 
 d_demand_curve <- function(x){
@@ -219,8 +219,8 @@ ggplot(data.frame(x=c(0,200))) +
   stat_function(fun=c_demand_curve, geom ="line", aes(color = "C")) +
   stat_function(fun=d_demand_curve, geom ="line", aes(color = "D")) +
   labs(x = "Abatement", y = "Price")+
-  scale_x_continuous(limits =c(0,200), expand = c(0,0))+
-  scale_y_continuous(limits=c(0,150), expand=c(0,0))+
+  scale_x_continuous(limits =c(0,350), expand = c(0,0))+
+  scale_y_continuous(limits=c(0,200), expand=c(0,0))+
   theme_bw() +
   labs(fill = "", color = "Sector") +
   xlab("\n Carbon Emissions (ton)") + 
@@ -245,6 +245,170 @@ a. Cap on carbon. Each sector (A, B, and C) must cut its carbon emissions by 100
 b. Tax on carbon. To emit a ton of carbon in country X, you must pay a tax of $t. You will need to find the tax that accomplishes the desired reduction.
 c. Cap and trade. Each sector (A, B, C) is allocated carbon permits equal to their current emissions minus 100 (same as in (a) above), thus achieving the total reduction of 300. Then, these three sectors are allowed to trade with each other. You will need to derive the outcome of that trading.
 
+```{r}
+#Option A. Cap on Carbon - every sector reduces by 100 tons
+
+#A now emits 80 tons
+#B now emits 100 tons
+#C now emits 120 tons
+#All abate 100 tons
+
+#1. Total cost
+
+#For each sector - how much does it cost to abate 100th unit? 
+
+a_100 <- a_curve(100)
+#$49
+
+b_100 <- b_curve(100)
+#$29.2
+
+c_100 <- c_curve(100)
+#66.7
+
+#For each sector - how many units do they abate at $0? - for Sectors with abatement y-intercepts below 0
+#Re-write functions in terms of Abatement (not price)
+
+a_abate <- function(x){(x - a_intercept)/a_slope}
+c_abate <- function(x){(x - c_intercept)/c_slope}
+b_abate <- function(x){(x - b_intercept)/b_slope}
+
+a_0abate <- a_abate(0) #15 units
+c_0abate <- c_abate(0) #14.9 units
+
+
+#Find total cost of abatement for each sector
+
+#A total cost
+a_cost <- (a_100*(100-a_0abate)*1/2) + (a_0abate*a_intercept*1/2)
+#$2020
+
+#B total cost 
+b_cost <- ((b_intercept + b_100)/2)*100
+#$1925
+
+#C total cost
+c_cost <- (c_100*(100-c_0abate)*1/2) + (c_0abate*a_intercept*1/2)
+#$2776
+
+#Total cost for country X
+total_cost_x <- c_cost + b_cost + a_cost
+#$6721
+
+#No tax revenue generated because no tax
+
+
+```
+
+
+```{r}
+#Option B. Tax on carbon. To emit a ton of carbon in country X, you must pay a tax of $t.
+#Need to reduce 300 tons total across all sectors. 
+
+#Get aggregate abatement curve. Add curves for 3 sectors horizontally.
+
+#A in terms of abatement 
+A1 <- 1/a_slope
+A2 <- a_intercept/a_slope
+
+#B in terms of abatement
+B1 <- 1/b_slope
+B2 <- b_intercept/b_slope
+
+#C in terms of abatement
+C1 <- 1/c_slope
+C2 <- c_intercept/c_slope
+
+#Aggregate in terms of abatement
+agg1 <- A1 + B1 + C1
+agg2 <- A2 + B2 + C2
+
+#Aggregate in terms of price (P)
+P_agg1 <- 1/agg1
+P_agg2 <- agg2/agg1
+
+agg_abate<- function(q) {P_agg1*q + P_agg2} 
+
+#Optimal tax
+tax <- agg_abate(300)
+#$39.4
+
+
+#1. Total Cost of Abatement for each Sector 
+
+#A Cost of Abatement#
+
+#How many units? 
+a_tax_units <- a_abate(39.4)
+#83.3 units 
+
+a_cost_tax <- (tax*(a_tax_units - a_0abate)*1/2) + (a_0abate*a_intercept*1/2) + ((180-a_tax_units)*tax)
+#$5095
+
+#B Cost of Abatement# 
+
+#How many units?
+b_tax_units <- b_abate(39.4)
+#151 units
+
+b_cost_tax <- (tax*(b_tax_units - b_0abate)*1/2) + (b_0abate*b_intercept*1/2) + ((200-b_tax_units)*tax)
+#$5607
+
+#C Cost of Abatement#
+
+#How many units? 
+c_tax_units <- c_abate(39.4)
+#65.1
+
+c_cost_tax <- (tax*(c_tax_units - c_0abate)*1/2) + (c_0abate*c_intercept*1/2) + ((220-c_tax_units)*tax)
+#$7010
+
+#2. Total Cost of abatement for country x
+total_cost_tax <- a_cost_tax + b_cost_tax + c_cost_tax
+#$17712
+
+#3. Total tax revenue
+total_tax_revenue <- ((180-a_tax_units)*tax) + ((200-b_tax_units)*tax) + ((220-c_tax_units)*tax)
+```
+
+
+```{r}
+#Option C. Cap and trade. Each sector (A, B, C) is allocated carbon permits equal to their current emissions minus 100 (same as in (a) above), thus achieving the total reduction of 300. Then, these three sectors are allowed to trade with each other. You will need to derive the outcome of that trading.
+
+#Who buys, who sells and how much of each? Benefit and cost of trade for each? 
+
+#A sells credits
+a_market_tons <- 100 - a_tax_units
+#16.7 tons 
+
+#A benefit from sale 
+a_credit_benefit <- a_market_tons * tax
+#$659
+
+#B buys credits
+b_market_tons <- 100 - b_tax_units
+#-51.4 tons
+
+#B cost from purchase
+b_credit_cost <- b_market_tons * tax
+#$2025
+
+#C buys credits
+c_market_tons <- 100 - c_tax_units
+#34.9 
+
+#C benefit from sale 
+c_credit_benefit <- c_market_tons * tax
+#$1375
+
+###Total Costs###
+
+#Sector A 
+
+a_ct_cost <- 
+
+
+```
 
 ### Part 4. Country Y
 Again, without any co-benefits, suppose that country Y (which only has one carbon-emitting sector, D) has no obligation to reduce its emissions. Country X asks country Y to enter the country X carbon market. Doing so would require country Y to put a cap on carbon emissions at its current level of emissions (300 tons), but would then allow country Y to sell carbon offsets to sectors A, B, or C. Are there any incentives for country Y to enter country X’s carbon market and to thus place a voluntary cap on its emissions? Are there any incentives for country X to try to attract country Y into its market?
