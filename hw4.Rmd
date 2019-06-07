@@ -321,17 +321,25 @@ total_cost_y <- d_cost
 A1 <- 1/a_slope
 A2 <- a_intercept/a_slope
 
+A_demand <- function(q){A1*q + A2}
+
 #B in terms of abatement
 B1 <- 1/b_slope
 B2 <- b_intercept/b_slope
+
+B_demand <- function(q){B1*q + B2}
 
 #C in terms of abatement
 C1 <- 1/c_slope
 C2 <- c_intercept/c_slope
 
+C_demand <- function(q){C1*q + C2}
+
 #D in terms of abatement
 D1 <- 1/d_slope
 D2 <- d_intercept/d_slope
+
+D_demand <- function(q){D1*q + D2}
 
 #Aggregate in terms of abatement
 agg1 <- A1 + B1 + C1
@@ -486,6 +494,25 @@ XY_agg_abate<- function(q) {P_XYagg2 + P_XYagg1*q}
 
 XY_cost <- XY_agg_abate(600)
 #$55.03
+
+# Emissions from each sector at price $55.03
+A_emissions <- A_demand(XY_cost)
+# 80
+
+B_emissions <- B_demand(XY_cost)
+# 324
+
+C_emissions <- C_demand(XY_cost)
+# 55.3
+
+D_emissions <- D_demand(XY_cost)
+#249
+
+X_demand <- A_emissions + B_emissions + C_emissions
+# 460
+
+
+#Y_demand will be 600 - X_demand =  140
 
 ```
 
