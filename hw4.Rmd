@@ -382,9 +382,6 @@ b_cost_tax <- (tax*(b_tax_units - b_0abate)*1/2) + (b_0abate*b_intercept*1/2) + 
 c_tax_units <- c_abate(39.4)
 #65.1
 
-d_tax_units <- d_abate(39.4)
-#114
-
 c_cost_tax <- (tax*(c_tax_units - c_0abate)*1/2) + (c_0abate*c_intercept*1/2) + ((220-c_tax_units)*tax)
 #$7010
 
@@ -464,9 +461,12 @@ Again, without any co-benefits, suppose that country Y (which only has one carbo
 d_abate <- d_curve(300)
 # 87.7
 
+d_cost <- ((d_intercept + d_abate)/2)*300
+#14603
+
 ```
 
-Country Y (which only has one carbon-emitting sector, D) has a marginal abatement cost of $87.7, which is less than country X (17,712 dollars). Until both Country X and Country Y both have the same marginal cost of abatement, both countries are better off being in the carbon market.
+Country Y (which only has one carbon-emitting sector, D) has a marginal abatement cost of $87.7, which is less than country X. Until both Country X and Country Y both have the same marginal cost of abatement, both countries are better off being in the carbon market.
 
 Incentives for Country Y to enter the the Country X carbon market: Benefit of selling carbon offsets to sectors A, B, and C of in Country X.
 Incentives for Country X to attract Country Y to the carbon market: Allowing sectors in Country X to emit more carbon by buying carbon offsets from Country Y and avoiding the increased costs of abatement.
