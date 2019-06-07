@@ -475,17 +475,17 @@ b. If country Y enters the carbon market for country X (as in question 4 above),
 ```{r}
 
 # Aggregate the slopes and intercepts
-XY_agg_intercept <- A1 + B1 + C1 + D1
-XY_agg_slope <- A2 + B2 + C2 + D2
+XY_agg1 <- A1 + B1 + C1 + D1
+XY_agg2 <- A2 + B2 + C2 + D2
 
 # In terms of price
-P_XYagg_demand_int <- (-XY_agg_intercept/XY_agg_slope)
-P_XYagg_demand_slope <- (1/XY_agg_slope)
+P_XYagg1 <- (1/XY_agg1) 
+P_XYagg2 <- (XY_agg2/XY_agg1)
 
-XY_agg_abate<- function(q) {P_XYagg_demand_int + P_XYagg_demand_slope*q} 
+XY_agg_abate<- function(q) {P_XYagg2 + P_XYagg1*q} 
 
 XY_cost <- XY_agg_abate(600)
-# 10.8
+#$55.03
 
 ```
 
