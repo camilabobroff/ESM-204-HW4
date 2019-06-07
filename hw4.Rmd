@@ -266,17 +266,21 @@ b_100 <- b_curve(100)
 c_100 <- c_curve(100)
 #66.7
 
+d_300 <- d_curve(300)
+#87.7
+
 #For each sector - how many units do they abate at $0? - for Sectors with abatement y-intercepts below 0
 #Re-write functions in terms of Abatement (not price)
 
 a_abate <- function(x){(x - a_intercept)/a_slope}
 c_abate <- function(x){(x - c_intercept)/c_slope}
 b_abate <- function(x){(x - b_intercept)/b_slope}
+d_abate <- function(x){(x - d_intercept)/d_slope}
 
 a_0abate <- a_abate(0) #15 units
 b_0abate <- b_abate(0) #-46.9 units
 c_0abate <- c_abate(0) #14.9 units
-
+d_0abate <- d_abate(0) #-37.3 units
 
 #Find total cost of abatement for each sector
 
@@ -292,13 +296,18 @@ b_cost <- ((b_intercept + b_100)/2)*100
 c_cost <- (c_100*(100-c_0abate)*1/2) + (c_0abate*a_intercept*1/2)
 #$2776
 
+d_cost <- (d_300*(300-d_0abate*1/2) + (d_0abate*d_intercept*1/2))
+#27753
+
 #Total cost for country X
 total_cost_x <- c_cost + b_cost + a_cost
 #$6721
 
 #No tax revenue generated because no tax
 
-
+#Total cost for country Y
+total_cost_y <- d_cost
+#$27753
 ```
 
 
@@ -319,6 +328,10 @@ B2 <- b_intercept/b_slope
 #C in terms of abatement
 C1 <- 1/c_slope
 C2 <- c_intercept/c_slope
+
+#D in terms of abatement
+D1 <- 1/d_slope
+D2 <- d_intercept/d_slope
 
 #Aggregate in terms of abatement
 agg1 <- A1 + B1 + C1
@@ -361,8 +374,14 @@ b_cost_tax <- (tax*(b_tax_units - b_0abate)*1/2) + (b_0abate*b_intercept*1/2) + 
 c_tax_units <- c_abate(39.4)
 #65.1
 
+d_tax_units <- d_abate(39.4)
+#114
+
 c_cost_tax <- (tax*(c_tax_units - c_0abate)*1/2) + (c_0abate*c_intercept*1/2) + ((220-c_tax_units)*tax)
 #$7010
+
+d_cost_tax <- (tax*(d_tax_units - d_0abate)*1/2) + (d_0abate*c_intercept*1/2) + ((220-d_tax_units)*tax)
+#$7372
 
 #2. Total Cost of abatement for country x
 total_cost_tax <- a_cost_tax + b_cost_tax + c_cost_tax
@@ -449,20 +468,27 @@ Now assume that every ton of carbon emissions creates 1 ton of local air polluti
 
 a. In a carbon cap and trade market that only covers sectors in country X, how much local air pollution would you expect in country X? In country Y?
 
-
+We expect 300 tons of pollution in country X given that the cap is set for 300 tons of carbon emissions.
 
 b. If country Y enters the carbon market for country X (as in question 4 above), how much local pollution will there be in country X and country Y?
 
 ```{r}
 
+# Aggregate the slopes and intercepts
+XY_agg_intercept <- A1 + B1 + C1 + D1
+XY_agg_slope <- A2 + B2 + C2 + D2
 
+# In terms of price
+P_XYagg_demand_int <- (-XY_agg_intercept/XY_agg_slope)
+P_XYagg_demand_slope <- (1/XY_agg_slope)
+
+XY_agg_abate<- function(q) {P_XYagg_demand_int + P_XYagg_demand_slope*q} 
+
+XY_cost <- XY_agg_abate(600)
+# 10.8
 
 ```
 
 c. What advice can you give country X and country Y about the desirability of allowing international trade of carbon emissions credits?
 
-```{r}
-
-
-```
 
